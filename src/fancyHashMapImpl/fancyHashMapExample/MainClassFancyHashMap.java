@@ -1,4 +1,4 @@
-package fancyHashMapExample;
+package fancyHashMapImpl.fancyHashMapExample;
 
 public class MainClassFancyHashMap {
 	public static void main(String[] args) {

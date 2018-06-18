@@ -1,4 +1,4 @@
-	package fancyHashMapExample;
+	package fancyHashMapImpl.fancyHashMapExample;
 	/*
 	 * FancyHashMap Class is created to mimic the HashMap Functionality of holding a key and value
 	 */
