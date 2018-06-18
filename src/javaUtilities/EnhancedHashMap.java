@@ -1,6 +1,7 @@
 package javaUtilities;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class EnhancedHashMap {
 	
@@ -13,21 +14,57 @@ public class EnhancedHashMap {
 		this.actualHashMap = new HashMap<String,String>();
 	}
 	
-	private void delete(String string) {
-		// TODO Auto-generated method stub
+	public void delete(String key) {
+		Iterator<HashMap<String,String>> it = this.fetchHashMap.values().iterator();
+		HashMap<String,String> comparedValue;
+		HashMap<String,String> actualValue;
+		while(it.hasNext()) {
+			comparedValue = (HashMap<String,String>)it.next();
+			actualValue = new HashMap<String,String>();
+			actualValue.put(key, this.actualHashMap.get(key));
+			if(actualValue.equals(comparedValue)) {
+				actualHashMap.remove(key);
+				it.remove();
+				resetFetchHashKeys();
+				counter--;
+				break;
+			}
+		}
 		
 	}
 
 
-	private char[] getAt(int i) {
-		// TODO Auto-generated method stub
+	public String getAt(int i) {
+		HashMap<String, String> hashMap = this.fetchHashMap.get(i);
+		String actualHashMapKey;
+		String derivedHashMapKey;
+		for(String key: this.actualHashMap.keySet()) {
+			actualHashMapKey = this.actualHashMap.get(key);
+			derivedHashMapKey = hashMap.get(key);
+			if(null != derivedHashMapKey && null != actualHashMapKey 
+					&& derivedHashMapKey.equals(actualHashMapKey)) {
+				return actualHashMapKey;
+			}
+			
+		}
 		return null;
 	}
 
 
-	private void push(String string, String string2) {
-		// TODO Auto-generated method stub
-		
+	public void push(String key, String value) {
+		HashMap<String,String> actualMap = new HashMap<String,String>();
+		actualMap.put(key,value);
+		this.actualHashMap.put(key, value);
+		this.fetchHashMap.put(counter++, actualMap);
+	}
+	
+	private void resetFetchHashKeys() {
+		for(int i=0;i<fetchHashMap.size();i++) {
+			if(null == fetchHashMap.get(i)) {
+				fetchHashMap.put(i,fetchHashMap.get(i+1));
+				fetchHashMap.remove(i+1);
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
