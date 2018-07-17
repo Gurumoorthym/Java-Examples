@@ -1,9 +1,20 @@
 package Handler;
 
 public class PurchaseRequest {
+	private final String item;
+	private final int quantity;
+	
+	public PurchaseRequest(String item, int quantity) {
+		this.item = item;
+		this.quantity = quantity;
+	}
 
-	public PurchaseRequest(String string, int i) {
-		// TODO Auto-generated constructor stub
+	public String getItem() {
+		return item;
+	}
+
+	public int getQuantity() {
+		return quantity;
 	}
 
 }

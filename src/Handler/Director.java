@@ -1,15 +1,22 @@
 package Handler;
 
-public class Director {
+public class Director extends Employee{
 
-	public void setSuccessor(VicePresident vp) {
-		// TODO Auto-generated method stub
+	@Override
+	public boolean processRequest(PurchaseRequest purchaseRequest) {
+		if (purchaseRequest.getQuantity() <= 500)//check for authorization
+        {
+			System.out.println("Ordered from Director");
+			return true;
+        }
+        else
+        {
+        	System.out.println("Trying to process the purchase through: " +getSuccessor());
+        	return getSuccessor().processRequest(purchaseRequest);
+        }
 		
 	}
 
-	public boolean processRequest(PurchaseRequest purchaseRequest) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+
 	
 }
