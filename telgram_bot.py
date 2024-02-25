@@ -8,7 +8,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 from telegram import ChatAction
 
 # Define your bot token here
-TOKEN = '6933107634:AAFpA4ZWZQecnED_aKTvh3pw2yAlRRc3qtY'
+TOKEN = ''
 
 # Define the list of authorized users
 AUTHORIZED_USERS = ["doluserver"]
