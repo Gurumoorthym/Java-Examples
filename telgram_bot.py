@@ -89,7 +89,7 @@ def execute_command(update, context):
         target_path = "/home/dolu/git/roop/Changed/video_to_swap_with.mp4"
         output_file = "/home/dolu/git/roop/Changed/changed.mp4"
     try:
-        command = f"python3 ~/git/roop/run.py --execution-provider cuda -s {source_path} -t {target_path} -o {output_file} --output-video-encoder 'h264_nvenc'"
+        command = f"python3 ~/git/roop/run.py -s {source_path} -t {target_path} -o {output_file} --output-video-encoder 'h264_nvenc' --keep-fps --execution-threads 64 --max-memory 30 --execution-provider cuda "
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         # Output command logs
         for line in process.stdout:
@@ -97,8 +97,14 @@ def execute_command(update, context):
             #context.bot.send_message(chat_id=update.effective_chat.id, text=line.strip())
         process.wait()  # Wait for the command to finish
         if os.path.exists(output_file):
-            with open(output_file, "rb") as file:
-                context.bot.send_document(chat_id=update.effective_chat.id, document=file)
+            # Check file size before sending
+            file_size_mb = os.path.getsize(output_file) / (1024 * 1024)  # Convert bytes to megabytes
+            if file_size_mb > 19:
+                logging.error("Output file size exceeds 19MB limit. File not deleted.")
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Error: File Size is larger than 19MB, Check Server for the file.")
+            else:
+                with open(output_file, "rb") as file:
+                    context.bot.send_document(chat_id=update.effective_chat.id, document=file)
         else:
             logging.error("Output file not found")
             context.bot.send_message(chat_id=update.effective_chat.id, text="Error: Output file not found.")
@@ -107,9 +113,9 @@ def execute_command(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {str(e)}")
     finally:
         # Remove the file after sending
-        if os.path.exists(output_file):
-            os.remove(source_path)
-            os.remove(target_path)
+        os.remove(source_path)
+        os.remove(target_path)
+        if os.path.exists(output_file) and not (os.path.getsize(output_file) / (1024 * 1024)) > 19:
             os.remove(output_file)
             help(update,context)
     pass
@@ -140,3 +146,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
