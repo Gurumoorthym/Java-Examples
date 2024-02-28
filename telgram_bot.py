@@ -2,16 +2,19 @@ import subprocess
 import logging
 import os
 import time
+from datetime import datetime
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
-
 from telegram import ChatAction
 
 # Define your bot token here
-TOKEN = ''
+TOKEN = '6933107634:AAFpA4ZWZQecnED_aKTvh3pw2yAlRRc3qtY'
 
 # Define the list of authorized users
 AUTHORIZED_USERS = ["doluserver"]
+
+# Get the current date and time
+current_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 # Conversation states
 PIC, SWAP_PIC, VIDEO, SWAP_VIDEO, FALLBACK = range(5)
@@ -89,19 +92,23 @@ def execute_command(update, context):
         target_path = "/home/dolu/git/roop/Changed/video_to_swap_with.mp4"
         output_file = "/home/dolu/git/roop/Changed/changed.mp4"
     try:
-        command = f"python3 ~/git/roop/run.py -s {source_path} -t {target_path} -o {output_file} --output-video-encoder 'h264_nvenc' --keep-fps --execution-threads 64 --max-memory 30 --execution-provider cuda "
+        command = f"python3 ~/git/roop/run.py -s {source_path} -t {target_path} -o {output_file} --output-video-encoder 'libx265' --keep-fps --execution-threads 64 --temp-frame-format 'png' --max-memory 30"
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         # Output command logs
         for line in process.stdout:
-            logging.info(line.strip())
+            logging.debug(line.strip())
             #context.bot.send_message(chat_id=update.effective_chat.id, text=line.strip())
         process.wait()  # Wait for the command to finish
         if os.path.exists(output_file):
             # Check file size before sending
+            # Append the current date to the filename
             file_size_mb = os.path.getsize(output_file) / (1024 * 1024)  # Convert bytes to megabytes
-            if file_size_mb > 19:
-                logging.error("Output file size exceeds 19MB limit. File not deleted.")
-                context.bot.send_message(chat_id=update.effective_chat.id, text="Error: File Size is larger than 19MB, Check Server for the file.")
+            if file_size_mb > 20:
+                logging.debug("Output file size exceeds 20MB limit.")
+                # Rename the output file
+                renamed_output_file = f"{output_file}_{current_date}.mp4"  # Change this to your desired filename
+                os.rename(output_file, renamed_output_file)
+                context.bot.send_message(chat_id=update.effective_chat.id, text="File saved to drive.")
             else:
                 with open(output_file, "rb") as file:
                     context.bot.send_document(chat_id=update.effective_chat.id, document=file)
@@ -117,7 +124,7 @@ def execute_command(update, context):
         os.remove(target_path)
         if os.path.exists(output_file) and not (os.path.getsize(output_file) / (1024 * 1024)) > 19:
             os.remove(output_file)
-            help(update,context)
+        help(update,context)
     pass
 
 def fallback(update, context):
@@ -146,4 +153,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
