@@ -47,14 +47,14 @@ def change_pic(update, context):
 
 def pic_received(update, context):
     file = context.bot.get_file(update.message.photo[-1].file_id)
-    file.download('/home/dolu/git/roop/Changed/pic_to_swap.jpg')
+    file.download('/home/dolu/roop/Changed/pic_to_swap.jpg')
     context.user_data['mode'] = 'PIC'
     context.bot.send_message(chat_id=update.effective_chat.id, text="Please upload the file to swap with (less than 2MB).")
     return SWAP_PIC
 
 def swap_pic(update, context):
     file = context.bot.get_file(update.message.photo[-1].file_id)
-    file.download('/home/dolu/git/roop/Changed/pic_to_swap_with.jpg')
+    file.download('/home/dolu/roop/Changed/pic_to_swap_with.jpg')
     context.bot.send_message(chat_id=update.effective_chat.id, text="Image received! Now processing...")
     execute_command(update, context)
     return ConversationHandler.END
@@ -65,14 +65,14 @@ def change_video(update, context):
 
 def video_received(update, context):
     file = context.bot.get_file(update.message.photo[-1].file_id)
-    file.download('/home/dolu/git/roop/Changed/video_to_swap.jpg')
+    file.download('/home/dolu/roop/Changed/video_to_swap.jpg')
     context.user_data['mode'] = 'VIDEO'
     context.bot.send_message(chat_id=update.effective_chat.id, text="Please upload the video to swap with (less than 20MB).")
     return SWAP_VIDEO
 
 def swap_video(update, context):
     file = context.bot.get_file(update.message.video.file_id)
-    file.download('/home/dolu/git/roop/Changed/video_to_swap_with.mp4')
+    file.download('/home/dolu/roop/Changed/video_to_swap_with.mp4')
     context.bot.send_message(chat_id=update.effective_chat.id, text="Video received! Now processing...")
     execute_command(update, context)
     return ConversationHandler.END
@@ -84,20 +84,20 @@ def execute_command(update, context):
     target_path = ""
     output_file = ""
     if context.user_data['mode'] == 'PIC':
-        source_path = "/home/dolu/git/roop/Changed/pic_to_swap.jpg"
-        target_path = "/home/dolu/git/roop/Changed/pic_to_swap_with.jpg"
-        output_file = "/home/dolu/git/roop/Changed/swapped_pic.jpg"
+        source_path = "/home/dolu/roop/Changed/pic_to_swap.jpg"
+        target_path = "/home/dolu/roop/Changed/pic_to_swap_with.jpg"
+        output_file = "/home/dolu/roop/Changed/swapped_pic.jpg"
     elif context.user_data['mode'] == 'VIDEO':
-        source_path = "/home/dolu/git/roop/Changed/video_to_swap.jpg"
-        target_path = "/home/dolu/git/roop/Changed/video_to_swap_with.mp4"
-        output_file = "/home/dolu/git/roop/Changed/changed.mp4"
+        source_path = "/home/dolu/roop/Changed/video_to_swap.jpg"
+        target_path = "/home/dolu/roop/Changed/video_to_swap_with.mp4"
+        output_file = "/home/dolu/roop/Changed/changed.mp4"
     try:
-        command = f"python3 ~/git/roop/run.py -s {source_path} -t {target_path} -o {output_file} --output-video-encoder 'libx265' --keep-fps --execution-threads 64 --temp-frame-format 'png' --max-memory 30"
+        command = f"python3 ~/roop/run.py -s {source_path} -t {target_path} -o {output_file} --execution-threads 64"
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         # Output command logs
         for line in process.stdout:
             logging.debug(line.strip())
-            #context.bot.send_message(chat_id=update.effective_chat.id, text=line.strip())
+            # context.bot.send_message(chat_id=update.effective_chat.id, text=line.strip())
         process.wait()  # Wait for the command to finish
         if os.path.exists(output_file):
             # Check file size before sending
